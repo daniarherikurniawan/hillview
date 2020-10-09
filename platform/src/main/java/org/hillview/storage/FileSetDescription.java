@@ -71,6 +71,7 @@ public class FileSetDescription implements IJson {
     public Double startTime;
     @Nullable
     public Double endTime;
+    public String delimiter = " ";
 
     @SuppressWarnings("unused")
     public String getBasename() {
@@ -105,11 +106,20 @@ public class FileSetDescription implements IJson {
             TextFileLoader loader;
             switch (FileSetDescription.this.fileKind) {
                 case "csv":
-                    CsvFileLoader.Config config = new CsvFileLoader.Config();
-                    config.allowFewerColumns = true;
-                    config.hasHeaderRow = FileSetDescription.this.headerRow;
+                    CsvFileLoader.Config configCSV = new CsvFileLoader.Config();
+                    // CSV only expects single char as delimiter
+                    configCSV.separator = FileSetDescription.this.delimiter;
+                    configCSV.allowFewerColumns = true;
+                    configCSV.hasHeaderRow = FileSetDescription.this.headerRow;
                     loader = new CsvFileLoader(
-                            this.pathname, config, FileSetDescription.this.getSchemaPath());
+                            this.pathname, configCSV, FileSetDescription.this.getSchemaPath());
+                    break;
+                case "tsv":
+                    TsvFileLoader.Config configTSV = new TsvFileLoader.Config();
+                    // TSV only expects tab as delimiter
+                    configTSV.allowFewerColumns = true;
+                    configTSV.hasHeaderRow = FileSetDescription.this.headerRow;
+                    loader = new TsvFileLoader(this.pathname, configTSV, FileSetDescription.this.getSchemaPath());
                     break;
                 case "orc":
                     loader = new OrcFileLoader(

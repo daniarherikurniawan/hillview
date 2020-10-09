@@ -156,7 +156,7 @@ export interface CassandraConnectionInfo extends JdbcConnectionInformation {
     cassandraRootDir: string;
 }
 
-export type DataKinds = "csv" | "orc" | "parquet" | "json" | "hillviewlog" | "db" | "genericlog" | "sstable";
+export type DataKinds = "csv" | "tsv" | "orc" | "parquet" | "json" | "hillviewlog" | "db" | "genericlog" | "sstable";
 
 export interface FileSetDescription {
     fileKind: DataKinds;
@@ -169,6 +169,7 @@ export interface FileSetDescription {
     logFormat: string | null;
     startTime: number | null;
     endTime: number | null;
+    delimiter: string | null;
 }
 
 export interface CountWithConfidence {

@@ -86,7 +86,8 @@ export class LoadView extends RemoteObject implements IDataView {
                         fileKind: "csv",
                         logFormat: null,
                         startTime: null,
-                        endTime: null
+                        endTime: null,
+                        delimiter: null
                     };
                     this.init.loadFiles(files, this.page);
                 },
@@ -103,7 +104,8 @@ export class LoadView extends RemoteObject implements IDataView {
                         fileKind: "orc",
                         logFormat: null,
                         startTime: null,
-                        endTime: null
+                        endTime: null,
+                        delimiter: null
                     };
                     this.init.loadFiles(files, this.page);
                 },
@@ -120,7 +122,8 @@ export class LoadView extends RemoteObject implements IDataView {
                         fileKind: "orc",
                         logFormat: null,
                         startTime: null,
-                        endTime: null
+                        endTime: null,
+                        delimiter: null
                     };
                     this.init.loadFiles(files, this.page);
                 },
@@ -138,7 +141,8 @@ export class LoadView extends RemoteObject implements IDataView {
                         fileKind: "csv",
                         logFormat: null,
                         startTime: null,
-                        endTime: null
+                        endTime: null,
+                        delimiter: null
                     };
                     this.init.loadFiles(files, this.page);
                 },
@@ -157,7 +161,8 @@ export class LoadView extends RemoteObject implements IDataView {
                         fileKind: "orc",
                         logFormat: null,
                         startTime: null,
-                        endTime: null
+                        endTime: null,
+                        delimiter: null
                     };
                     this.init.loadFiles(files, this.page);
                 },
@@ -202,6 +207,15 @@ export class LoadView extends RemoteObject implements IDataView {
                 text: "CSV files...",
                 action: () => {
                     const dialog = new CSVFileDialog();
+                    dialog.setAction(() => this.init.loadFiles(dialog.getFiles(), this.page));
+                    dialog.show();
+                },
+                help: "A set of comma-separated value files residing on the worker machines."
+            },
+            {
+                text: "TSV files...",
+                action: () => {
+                    const dialog = new TSVFileDialog();
                     dialog.setAction(() => this.init.loadFiles(dialog.getFiles(), this.page));
                     dialog.show();
                 },
@@ -441,8 +455,42 @@ class CSVFileDialog extends Dialog {
         pattern.required = true;
         this.addTextField("schemaFile", "Schema file (optional)", FieldKind.String, "schema",
             "The name of a JSON file that contains the schema of the data (leave empty if no schema file exists).");
+        this.addTextField("delimiter", "delimiter (comma is the default)", FieldKind.String, ",",
+            "Delimiter to separate each item/field.");
         this.addBooleanField("hasHeader", "Header row", false, "True if first row in each file is a header row");
         this.setCacheTitle("CSVFileDialog");
+    }
+
+    public getFiles(): FileSetDescription {
+        return {
+          schemaFile: this.getFieldValue("schemaFile"),
+          fileNamePattern: this.getFieldValue("fileNamePattern"),
+          headerRow: this.getBooleanValue("hasHeader"),
+          repeat: 1,
+          name: null,
+          fileKind: "csv",
+          logFormat: null,
+          startTime: null,
+          endTime: null,
+          delimiter: this.getFieldValue("delimiter")
+        };
+    }
+}
+
+/**
+ * Dialog that asks the user which TSV files to load.
+ */
+class TSVFileDialog extends Dialog {
+    constructor() {
+        super("Load TSV files",
+            "Loads tab-separated value (TSV) files from all machines that are part of the service.");
+        const pattern = this.addTextField("fileNamePattern", "File name pattern", FieldKind.String, "/*.csv",
+            "Shell pattern that describes the names of the files to load.");
+        pattern.required = true;
+        this.addTextField("schemaFile", "Schema file (optional)", FieldKind.String, "schema",
+            "The name of a JSON file that contains the schema of the data (leave empty if no schema file exists).");
+        this.addBooleanField("hasHeader", "Header row", false, "True if first row in each file is a header row");
+        this.setCacheTitle("TSVFileDialog");
     }
 
     public getFiles(): FileSetDescription {
@@ -452,10 +500,11 @@ class CSVFileDialog extends Dialog {
             headerRow: this.getBooleanValue("hasHeader"),
             repeat: 1,
             name: null,
-            fileKind: "csv",
+            fileKind: "tsv",
             logFormat: null,
             startTime: null,
-            endTime: null
+            endTime: null,
+            delimiter: null
         };
     }
 }
@@ -493,7 +542,8 @@ class GenericLogDialog extends Dialog {
             cookie: getUUID(),
             fileKind: "genericlog",
             startTime: Converters.doubleFromDate(this.getDateTimeValue("startTime")),
-            endTime: Converters.doubleFromDate(this.getDateTimeValue("endTime"))
+            endTime: Converters.doubleFromDate(this.getDateTimeValue("endTime")),
+            delimiter: null
         };
     }
 }
@@ -524,7 +574,8 @@ class JsonFileDialog extends Dialog {
             fileKind: "json",
             logFormat: null,
             startTime: null,
-            endTime: null
+            endTime: null,
+            delimiter: null
         };
     }
 }
@@ -552,7 +603,8 @@ class ParquetFileDialog extends Dialog {
             fileKind: "parquet",
             logFormat: null,
             startTime: null,
-            endTime: null
+            endTime: null,
+            delimiter: null
         };
     }
 }
@@ -583,7 +635,8 @@ class OrcFileDialog extends Dialog {
             fileKind: "orc",
             logFormat: null,
             startTime: null,
-            endTime: null
+            endTime: null,
+            delimiter: null
         };
     }
 }

@@ -42,7 +42,7 @@ public class CsvFileLoader extends TextFileLoader {
         /**
          * Field separator in CSV file.
          */
-        public char separator = ',';
+        public String separator = ",";
         /**
          * If true we allow a row to have fewer columns; the row is padded with "nulls".
          */

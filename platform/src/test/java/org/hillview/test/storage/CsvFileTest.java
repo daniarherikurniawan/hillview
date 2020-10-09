@@ -83,7 +83,7 @@ public class CsvFileTest extends BaseTest {
         CsvFileLoader.Config config = new CsvFileLoader.Config();
         config.allowFewerColumns = false;
         config.hasHeaderRow = false;
-        config.separator = '\t';
+        config.separator = "\t";
         CsvFileLoader r = new CsvFileLoader(path.toString(), config, schemaPath.toString());
         ITable t = r.load();
         Assert.assertNotNull(t);

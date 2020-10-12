@@ -209,6 +209,50 @@ export abstract class TSViewBase extends BigTableView {
         dialog.show();
     }
 
+
+    public saveAsCSV(schema: SchemaClass): void {
+        const dialog = new Dialog("Save as CSV file",
+            "Describe the set of CSV files where data will be saved");
+        const folder = dialog.addTextField("folderName", "Folder", FieldKind.String, "tmp",
+            "All CSV files will be written to this folder as <folder>/*_saved.csv");
+        folder.required = true;
+        const delimiter = dialog.addTextField("delimiter", "Delimiter", FieldKind.String, " ",
+            "Default delimiter is a space.");
+        delimiter.required = true;
+        dialog.setCacheTitle("saveAsDialog");
+
+        class SaveReceiver extends OnCompleteReceiver<boolean> {
+            pageName: String;
+            folder: String;
+            constructor(page: FullPage, operation: ICancellable<boolean>, pageName: String, folder: String) {
+                super(page, operation, "Save as CSV file");
+                this.pageName = pageName;
+                this.folder = folder;
+            }
+
+            public run(value: boolean): void {
+                if (value) {
+                    this.page.reportError("Save succeeded.");
+                    alert("Saved at " + this.pageName.substring(0, this.pageName.lastIndexOf("/")) + "/" + this.folder);
+                }
+            }
+        }
+
+        dialog.setAction(() => {
+            const folderName = dialog.getFieldValue("folderName");
+            const delimiter = dialog.getFieldValue("delimiter");
+            const rr = this.createStreamingRpcRequest<boolean>("saveAsCSV", {
+                delimiter: delimiter,
+                folder: folderName,
+                schema: schema.schema,
+                renameMap: schema.getRenameVector(),
+            });
+            const renderer = new SaveReceiver(this.page, rr, this.dataset.toString(), folderName);
+            rr.invoke(renderer);
+        });
+        dialog.show();
+    }
+
     public createJSColumnDialog(order: RecordOrder | null, tableRowsDesired: number,
                                 aggregates: AggregateDescription[] | null): void {
         const dialog = new Dialog(
@@ -379,10 +423,15 @@ export abstract class TSViewBase extends BigTableView {
     public saveAsMenu(): TopMenuItem {
         return {
             text: "Save as", help: "Save the data to persistent storage.", subMenu: new SubMenu([
+                // {
+                //     text: "Save as ORC files...",
+                //     action: () => this.saveAsOrc(this.schema),
+                //     help: "Save the data to a set of ORC files on the remote machines.",
+                // },
                 {
-                    text: "Save as ORC files...",
-                    action: () => this.saveAsOrc(this.schema),
-                    help: "Save the data to a set of ORC files on the remote machines.",
+                    text: "Save as CSV file...",
+                    action: () => this.saveAsCSV(this.schema),
+                    help: "Save the data to a single CSV file on the root machine.",
                 },
             ]),
         };

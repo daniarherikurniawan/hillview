@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.zip.GZIPOutputStream;
 
 public class CsvFileWriter implements ITableWriter {
-    private char separator = ',';
+    private String separator = ",";
     private boolean writeHeaderRow = true;
     private final String fileName;
     private boolean compress = false;
@@ -37,7 +37,7 @@ public class CsvFileWriter implements ITableWriter {
 
     public void setCompress(boolean compress) { this.compress = compress; }
 
-    public void setSeparator(char separator) { this.separator = separator; }
+    public void setSeparator(String separator) { this.separator = separator; }
 
     public void setWriteHeaderRow(boolean write) { this.writeHeaderRow = write; }
 

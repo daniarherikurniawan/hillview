@@ -173,6 +173,7 @@ public final class TableTarget extends TableRpcTarget {
     }
 
     static class SaveAsArgs {
+        String delimiter = "";
         String folder = "";
         @Nullable
         Schema schema;
@@ -251,6 +252,13 @@ public final class TableTarget extends TableRpcTarget {
         SaveAsArgs args = request.parseArgs(SaveAsArgs.class);
         SaveAsOrcSketch sk = new SaveAsOrcSketch(
                 args.folder, args.schema, Utilities.arrayToMap(args.renameMap), true);
+        this.runCompleteSketch(this.table, sk, request, context);
+    }
+
+    @HillviewRpc
+    public void saveAsCSV(RpcRequest request, RpcRequestContext context) {
+        SaveAsArgs args = request.parseArgs(SaveAsArgs.class);
+        SaveAsCSVSketch sk = new SaveAsCSVSketch(args.delimiter, args.folder, args.schema, Utilities.arrayToMap(args.renameMap), true);
         this.runCompleteSketch(this.table, sk, request, context);
     }
 
